@@ -5,6 +5,7 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
 import { auth } from '../(auth)/auth';
 import Script from 'next/script';
+import { SessionProvider } from "next-auth/react"
 
 export const experimental_ppr = true;
 
@@ -24,7 +25,9 @@ export default async function Layout({
       />
       <SidebarProvider defaultOpen={!isCollapsed}>
         <AppSidebar user={session?.user} />
-        <SidebarInset>{children}</SidebarInset>
+        <SessionProvider session={session}>
+          <SidebarInset>{children}</SidebarInset>
+        </SessionProvider>
       </SidebarProvider>
     </>
   );

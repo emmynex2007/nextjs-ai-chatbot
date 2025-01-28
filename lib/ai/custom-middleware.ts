@@ -14,6 +14,7 @@ const trackUserLLMUsage = async (usage: LLMUsage, type: UsageType) => {
   const userId = session?.user?.id;
 
   // TODO: track user usage in a database
+  
   console.dir({usage, userId, type}, { depth: null }); 
 }
 

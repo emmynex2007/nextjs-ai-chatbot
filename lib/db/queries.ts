@@ -41,7 +41,7 @@ export async function createUser(email: string, password: string) {
   const DEFAULT_TOKEN = 10000;
 
   try {
-    return await db.insert(user).values({ email, password: hash, token: DEFAULT_TOKEN});
+    return await db.insert(user).values({ email, password: hash, llmToken: DEFAULT_TOKEN});
   } catch (error) {
     console.error('Failed to create user in database');
     throw error;
