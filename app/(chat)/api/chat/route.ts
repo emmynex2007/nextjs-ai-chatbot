@@ -59,6 +59,10 @@ export async function POST(request: Request) {
     return new Response('Unauthorized', { status: 401 });
   }
 
+  if (session.user.llmToken < 1) {
+    return new Response('LLM quota exhausted', {status: 400});
+  }
+
   const model = models.find((model) => model.id === modelId);
 
   if (!model) {

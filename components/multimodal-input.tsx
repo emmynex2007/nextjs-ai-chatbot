@@ -29,6 +29,7 @@ import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
 import { SuggestedActions } from './suggested-actions';
 import equal from 'fast-deep-equal';
+import { useSession } from "next-auth/react"
 
 function PureMultimodalInput({
   chatId,
@@ -67,12 +68,23 @@ function PureMultimodalInput({
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
+  const { data: session } = useSession();
+  const [hasLLMToken, setHasLLMToken] = useState<boolean>(false);
 
   useEffect(() => {
     if (textareaRef.current) {
       adjustHeight();
     }
+
+    if (session && session.user){
+      setHasLLMToken(session.user.llmToken > 0);
+    }
   }, []);
+
+  // useEffect(() => {
+  //   if (!session || !session.user) return;
+  //   setIsLimitExceeded(session.user.llmToken < 1);
+  // }, [session?.user.llmToken])
 
   const adjustHeight = () => {
     if (textareaRef.current) {
@@ -197,7 +209,8 @@ function PureMultimodalInput({
     <div className="relative w-full flex flex-col gap-4">
       {messages.length === 0 &&
         attachments.length === 0 &&
-        uploadQueue.length === 0 && (
+        uploadQueue.length === 0 &&
+        hasLLMToken && (
           <SuggestedActions append={append} chatId={chatId} />
         )}
 
@@ -208,6 +221,7 @@ function PureMultimodalInput({
         multiple
         onChange={handleFileChange}
         tabIndex={-1}
+        disabled={!hasLLMToken}
       />
 
       {(attachments.length > 0 || uploadQueue.length > 0) && (
@@ -229,6 +243,10 @@ function PureMultimodalInput({
           ))}
         </div>
       )}
+
+      {!hasLLMToken && 
+        <div className='text-red-500'>You have exhausted your LLM Quota.</div>
+      }
 
       <Textarea
         ref={textareaRef}
@@ -252,6 +270,7 @@ function PureMultimodalInput({
             }
           }
         }}
+        disabled={!hasLLMToken}
       />
 
       <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start">
